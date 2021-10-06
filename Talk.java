@@ -4,7 +4,7 @@ import java.io.*;
 
 
 public class Talk {  
-	// define client socket
+	//define client socket
 	private Socket socket = null;
 	//define server socket
 	private ServerSocket server = null;
@@ -14,9 +14,10 @@ public class Talk {
 	private BufferedReader in;
     //define output stream
 	private PrintWriter out;
+	//Sender's nametag
 	private String[] sender = {"Client", "Server"};
 	private String name;
-	private int port = 12987;
+	private int port = 12384;
 //	private InetAddress ia = InetAddress.getLocalHost();
 //	private String address = ia.getHostAddress();
 	private String address = "localhost";
@@ -30,24 +31,27 @@ public class Talk {
 				case "-h":
 					System.out.println("-h");
 					h();
-					
+					break;
 				case "-s":
 					System.out.println("-s");
 					s();
+					break;
 				case "-a":
 					System.out.println("-a");
 					a();
+					break;
 				case "-help":
 					System.out.println("-help");
 					help();
+					break;
 			}
-			
+			messageHandling();
 		}catch(Exception e) {
 			System.out.println(e);
 		}
 	}
 	private void status() {
-		System.out.printf("Status:\nAddress: %s \nPort: %d", address, port);
+		System.out.printf("\nStatus:\n -Address: %s \n -Port: %d\n", address, port);
 	}
 	
 	
@@ -57,7 +61,6 @@ public class Talk {
 			socket = new Socket(address, port);
 			//Sender's nametag
 			name = sender[1];
-			messageHandling();
 		}catch(Exception x){
 			System.out.println("Client unable to communicate with server");
 			System.out.println(x);
@@ -73,7 +76,6 @@ public class Talk {
 			System.out.println("Client connected");
 			//Sender's nametag
 			name = sender[0];
-			messageHandling();
 		}catch(Exception r) {
 			System.out.println("“Server unable to listen on specified port");
 			System.out.println(r);
@@ -87,13 +89,14 @@ public class Talk {
 		}catch(Exception x){
 			System.out.println("Client unable to communicate with server");
 		}finally{
+			System.out.println("Starting server instead");
 			s();
 		}
 
 	}
 	//tells user how to use program
 	private void help(){
-		System.out.println("\nThis program opens a socket and, based on the mode given, acts as a server or a client.\n Author: A\n Modes:\n  -h: runs the program as a client and looks for server.\n  -s: runs the program as a server and looks for client.\n  -a: runs the program as a client and looks for a server but if no server is found, it switches to act as a server.\n");
+		System.out.println("\nThis program opens a socket and, based on the mode given, acts as a server or a client.\n Author: Awsam\n Modes:\n  -h: runs the program as a client and looks for server.\n  -s: runs the program as a server and looks for client.\n  -a: runs the program as a client and looks for a server but if no server is found, it switches to act as a server.\n");
 	}
 	//method to handle all messages
 	private void messageHandling() {
@@ -108,7 +111,7 @@ public class Talk {
             out = new PrintWriter(socket.getOutputStream(), true);
             
             // start signal
-         	System.out.println("Connected");
+         	System.out.println("\n--Connected--");
 		}catch(Exception c) {
 			System.out.println(c);
 		}
@@ -120,20 +123,20 @@ public class Talk {
 		try {
 			//Writes to server
 		    while(true){
+				//STATUS
+				if(console.equals("STATUS")) {
+					status();
+					console = con.readLine();
+					out.println(console);
+				}
+				//Send Msg
 				while(con.ready() == true){
-					//System.out.println(console);
-				    //STATUS
-					if(console.equals("STATUS")) {
-						status();
-						console = con.readLine();
-					}else {
-						console = con.readLine();
-						out.println(console);
-						//System.out.println("client:" + console);
-						//System.out.println("server: " + (fromServer = in.readLine()));
-					}
-			}
-				
+					console = con.readLine();
+					out.println(console);
+					//System.out.println("client:" + console);
+					//System.out.println("server: " + (fromServer = in.readLine()));
+				}
+				//Receive Msg
 				while(in.ready() == true){	
 					fromServer = in.readLine();
 					System.out.println(name + ": " + fromServer);
